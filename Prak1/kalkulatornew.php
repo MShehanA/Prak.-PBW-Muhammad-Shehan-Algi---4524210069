@@ -1,5 +1,5 @@
+```php
 <?php
-// kalkulator.php
 $hasil = null;
 $pesan = '';
 
@@ -7,40 +7,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $a = (float) ($_POST['a'] ?? 0);
     $b = (float) ($_POST['b'] ?? 0);
     $c = (float) ($_POST['c'] ?? 0);
-    $operator = $_POST['operator'] ?? '+';
 
-    switch ($operator) {
-        case '+':
-            $hasil = $a + $b + $c;
-            $hasil = $a + ($b * $c) ;
-            $hasil = ($a * $b) + $c;
-            $hasil = $a + ($b / $c) ;
-            $hasil = ($a / $b) + $c;
-            break;
+    $operator1 = $_POST['operator1'] ?? '+';
+    $operator2 = $_POST['operator2'] ?? '+';
 
-        case '-':
-            $hasil = $a - $b - $c;
-            $hasil = ($a / $b) - $c;
-            $hasil = $a - ($b / $c) ;
-            $hasil = $a - ($b * $c);
-            $hasil = ($a * $b) - $c;
-            break;
+    // Fungsi untuk menghitung dua angka
+    function hitung($x, $y, $operator)
+    {
+        switch ($operator) {
+            case '+':
+                return $x + $y;
 
-        case '*':
-            $hasil = $a * $b * $c;
-            break;
+            case '-':
+                return $x - $y;
 
-        case '/':
-            if ($b == 0) {
-                $pesan = 'Pembagian dengan nol tidak diperbolehkan.';
-            } else {
-                $hasil = $a / $b / $c;
+            case '*':
+                return $x * $y;
 
-            }
-            break;
+            case '/':
+                if ($y == 0) {
+                    return null;
+                }
+                return $x / $y;
 
-        default:
-            $pesan = 'Operator tidak valid.';
+            case '^':
+                return $x ** $y;
+
+            default:
+                return null;
+        }
+    }
+
+    // Hitung a operator1 b
+    $hasilPertama = hitung($a, $b, $operator1);
+
+    if ($hasilPertama === null) {
+        $pesan = 'Pembagian dengan nol tidak diperbolehkan atau operator tidak valid.';
+    } else {
+        // Hitung hasil pertama operator2 c
+        $hasil = hitung($hasilPertama, $c, $operator2);
+
+        if ($hasil === null) {
+            $pesan = 'Pembagian dengan nol tidak diperbolehkan atau operator tidak valid.';
+        }
     }
 }
 ?>
@@ -54,37 +63,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+
     <h1>Kalkulator Sederhana</h1>
 
     <form method="post">
-        <input type="number" step="any" name="a" required>
 
-        <select name="operator">
-            <option>+</option>
-            <option>-</option>
-            <option>*</option>
-            <option>/</option>
+        <!-- Angka A -->
+        <input
+            type="number"
+            step="any"
+            name="a"
+            value="<?= htmlspecialchars($_POST['a'] ?? '') ?>"
+            required
+        >
+
+        <!-- Operator 1 -->
+        <select name="operator1">
+            <option value="+" <?= (($_POST['operator1'] ?? '') === '+') ? 'selected' : '' ?>>+</option>
+            <option value="-" <?= (($_POST['operator1'] ?? '') === '-') ? 'selected' : '' ?>>-</option>
+            <option value="*" <?= (($_POST['operator1'] ?? '') === '*') ? 'selected' : '' ?>>*</option>
+            <option value="/" <?= (($_POST['operator1'] ?? '') === '/') ? 'selected' : '' ?>>/</option>
+            <option value="^" <?= (($_POST['operator1'] ?? '') === '^') ? 'selected' : '' ?>>^</option>
         </select>
 
-        <input type="number" step="any" name="b" required>
+        <!-- Angka B -->
+        <input
+            type="number"
+            step="any"
+            name="b"
+            value="<?= htmlspecialchars($_POST['b'] ?? '') ?>"
+            required
+        >
 
-        <select name="operator">
-            <option>+</option>
-            <option>-</option>
-            <option>*</option>
-            <option>/</option>
+        <!-- Operator 2 -->
+        <select name="operator2">
+            <option value="+" <?= (($_POST['operator2'] ?? '') === '+') ? 'selected' : '' ?>>+</option>
+            <option value="-" <?= (($_POST['operator2'] ?? '') === '-') ? 'selected' : '' ?>>-</option>
+            <option value="*" <?= (($_POST['operator2'] ?? '') === '*') ? 'selected' : '' ?>>*</option>
+            <option value="/" <?= (($_POST['operator2'] ?? '') === '/') ? 'selected' : '' ?>>/</option>
+            <option value="^" <?= (($_POST['operator2'] ?? '') === '^') ? 'selected' : '' ?>>^</option>
         </select>
 
-        <input type="number" step="any" name="c" required>
+        <!-- Angka C -->
+        <input
+            type="number"
+            step="any"
+            name="c"
+            value="<?= htmlspecialchars($_POST['c'] ?? '') ?>"
+            required
+        >
 
         <button type="submit">Hitung</button>
+
     </form>
 
     <?php if ($pesan): ?>
-        <p><?= htmlspecialchars($pesan) ?></p>
+
+        <p style="color: red;">
+            <?= htmlspecialchars($pesan) ?>
+        </p>
+
     <?php elseif ($hasil !== null): ?>
-        <p>Hasil: <?= htmlspecialchars((string)$hasil) ?></p>
+
+        <p>
+            <strong>Hasil:</strong>
+            <?= htmlspecialchars((string) $hasil) ?>
+        </p>
+
     <?php endif; ?>
+
 </body>
 
 </html>
+```
